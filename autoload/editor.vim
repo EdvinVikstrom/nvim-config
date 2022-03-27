@@ -35,23 +35,6 @@ function editor#close_buffer()
 endfunction
 
 function editor#quit()
-  let bufs = nvim_list_bufs()
-
-  let unsaved = 0
-  for buf in bufs
-    if nvim_buf_is_loaded(buf)
-      if nvim_buf_get_option(buf, 'modified')
-	let unsaved += 1
-      endif
-    endif
-  endfor
-
-  if unsaved != 0
-    if helper#input_yesno(unsaved.' buffer(s) unsaved. Do you want to close anyway?', -1)
-      quitall!
-    endif
-  endif
-
   quitall
 endfunction
 

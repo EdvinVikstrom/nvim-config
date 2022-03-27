@@ -94,33 +94,56 @@ endfunction
 " params: ['view': view, 'node': node]
 function filer#view#render_dir_node(view, node, parent, nest, line)
   if a:node.expanded
-    let line = a:line.a:view.conf.tree_opened_icon.' '.a:node.name.'/'
+    let line = a:line.a:view.conf.symbols.tree_expanded.' '.a:node.name.'/'
     call add(a:view.nodes, filer#view#create_node(len(a:view.nodes), a:node, a:parent, a:nest, line))
     call filer#view#render(a:view, a:node, a:view.nodes[-1], a:nest + 1)
   else
-    let line = a:line.a:view.conf.tree_closed_icon.' '.a:node.name.'/'
+    let line = a:line.a:view.conf.symbols.tree_closed.' '.a:node.name.'/'
     call add(a:view.nodes, filer#view#create_node(len(a:view.nodes), a:node, a:parent, a:nest, line))
   endif
 endfunction
 
-" params: ['view': view, 'node': node]
+" params: ['view': view, 'node': node,
+"          'parent': node, 'nest': int, 'line': string]
 function filer#view#render_file_node(view, node, parent, nest, line)
   if a:node.type == 'link'
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name.a:view.conf.link_icon
+    let line = a:line.'  '.a:node.name.a:view.conf.symbols.link
   elseif a:node.type == 'bdev'
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name.a:view.conf.bdev_icon
+    let line = a:line.'  '.a:node.name.a:view.conf.symbols.bdev
   elseif a:node.type == 'cdev'
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name.a:view.conf.cdev_icon
+    let line = a:line.'  '.a:node.name.a:view.conf.symbols.cdev
   elseif a:node.type == 'socket'
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name.a:view.conf.socket_icon
+    let line = a:line.'  '.a:node.name.a:view.conf.symbols.socket
   elseif a:node.type == 'fifo'
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name.a:view.conf.fifo_icon
+    let line = a:line.'  '.a:node.name.a:view.conf.symbols.fifo
   elseif a:node.perm == 3
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name
+    let line = a:line.'  '.a:node.name
   else
-    let line = a:line.a:view.conf.file_icon.' '.a:node.name.a:view.conf.priv_icon
+    let line = a:line.'  '.a:node.name.a:view.conf.symbols.priv
   endif
+
+  let symbol = filer#view#get_file_symbol(a:view, a:node)
+  let numw = (nvim_win_get_option(a:view.win, 'number') || nvim_win_get_option(a:view.win, 'relativenumber')) ?
+	\ nvim_win_get_option(a:view.win, 'numberwidth') : 0
+  let off = nvim_win_get_width(a:view.win) - numw -
+	\ strdisplaywidth(line) - strdisplaywidth(symbol)
+
+  let line = line.repeat(' ', off).symbol
   call add(a:view.nodes, filer#view#create_node(len(a:view.nodes), a:node, a:parent, a:nest, line))
+endfunction
+
+" params: ['view': view, 'node': node]
+" return: string
+function filer#view#get_file_symbol(view, node)
+  if type(a:view.conf.symbols.file) == v:t_list
+    for entry in a:view.conf.symbols.file
+      if a:node.name =~ entry.pattern
+	return entry.symbol
+      endif
+    endfor
+    return ''
+  endif
+  return a:view.conf.symbols.file
 endfunction
 
 " params: ['view': view, 'path': string]

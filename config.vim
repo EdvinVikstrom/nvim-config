@@ -51,6 +51,9 @@
 " Cmp
   set completeopt=menu,menuone,noselect
 
+" Filer
+  let g:filer_symbols_file = filer#symbols#get()
+
 " Mappings
   command Bd bp|sp|bn|bd
 

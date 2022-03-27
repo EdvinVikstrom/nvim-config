@@ -1,49 +1,35 @@
 " 'Filer' is swedish for 'Files' ;)
 
-let g:filer_directory_sort = get(g:, 'filer_directory_sort', 1)
-let g:filer_close_children = get(g:, 'filer_close_children', 1)
-let g:filer_view = #{
-  \ name: get(g:, 'filer_view.name', 'filer'),
-  \ width: get(g:, 'filer_view.width', 40),
-  \ position: get(g:, 'filer_view.position', 'right'),
-  \ show_hidden: get(g:, 'filer_view.show_hidden', 0),
-  \ file_icon: get(g:, 'filer_view.file_icon', '-'),
-  \ link_icon: get(g:, 'filer_view.link_icon', '@'),
-  \ bdev_icon: get(g:, 'filer_view.bdev_icon', '#'),
-  \ cdev_icon: get(g:, 'filer_view.cdev_icon', '%'),
-  \ socket_icon: get(g:, 'filer_view.socket_icon', '='),
-  \ fifo_icon: get(g:, 'filer_view.fifo_icon', '|'),
-  \ priv_icon: get(g:, 'filer_view.privfile_icon', '~'),
-  \ tree_opened_icon: get(g:, 'filer_view.tree_opened_icon', '▾'),
-  \ tree_closed_icon: get(g:, 'filer_view.tree_closed_icon', '▸')
-  \ }
-
-let g:filer#default_config = #{
-      \ directory_sort: g:filer_directory_sort,
-      \ close_children: g:filer_close_children,
+function filer#get_config()
+  return #{
+      \ directory_sort: get(g:, 'filer_directory_sort', 1),
+      \ close_children: get(g:, 'filer_close_children', 1),
       \ view: #{
-      \ 	name: g:filer_view.name,
-      \ 	width: g:filer_view.width,
-      \ 	position: g:filer_view.position,
-      \ 	show_hidden: g:filer_view.show_hidden,
-      \ 	file_icon: g:filer_view.file_icon,
-      \ 	link_icon: g:filer_view.link_icon,
-      \ 	bdev_icon: g:filer_view.bdev_icon,
-      \ 	cdev_icon: g:filer_view.cdev_icon,
-      \ 	socket_icon: g:filer_view.socket_icon,
-      \ 	fifo_icon: g:filer_view.fifo_icon,
-      \ 	priv_icon: g:filer_view.priv_icon,
-      \ 	tree_opened_icon: g:filer_view.tree_opened_icon,
-      \ 	tree_closed_icon: g:filer_view.tree_closed_icon
+      \ 	name: get(g:, 'filer_name', 'filer'),
+      \ 	width: get(g:, 'filer_width', 40),
+      \ 	position: get(g:, 'filer_position', 'right'),
+      \ 	show_hidden: get(g:, 'filer_show_hidden', 0),
+      \		symbols: #{
+      \			file: get(g:, 'filer_symbols_file', '-'),
+      \			link: get(g:, 'filer_symbols_link', '@'),
+      \			bdev: get(g:, 'filer_symbols_bdev', '#'),
+      \			cdev: get(g:, 'filer_symbols_cdev', '%'),
+      \			socket: get(g:, 'filer_symbols_socket', '='),
+      \			fifo: get(g:, 'filer_symbols_fifo', '|'),
+      \			priv: get(g:, 'filer_symbols_priv', '~'),
+      \			tree_closed: get(g:, 'filer_symbols_tree_closed', '▸'),
+      \			tree_expanded: get(g:, 'filer_symbols_tree_expanded', '▾')
+      \		}
       \ },
       \ input: #{
       \ }
       \ }
+endfunction
 
 " params: ['conf': config]
 " return: filer
 function filer#create()
-  let conf = copy(g:filer#default_config)
+  let conf = filer#get_config()
   let filer = #{view: {}, input: {}, tree: {}, conf: conf}
   call filer#init_view(filer, conf)
   call filer#init_input(filer, conf)
